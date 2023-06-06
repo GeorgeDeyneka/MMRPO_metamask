@@ -1,0 +1,74 @@
+@font-face {
+  font-family: "Gilroy";
+  src: local("Gilroy-Bold"),
+    url("../fonts/Gilroy/Gilroy-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Gilroy";
+  src: local("Gilroy-Semibold"),
+    url("../fonts/Gilroy/Gilroy-Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Gilroy";
+  src: local("Gilroy-Medium"),
+    url("../fonts/Gilroy/Gilroy-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Gilroy";
+  src: local("Gilroy-Regular"),
+    url("../fonts/Gilroy/Gilroy-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+p {
+  font-size: 16px;
+  line-height: 125%;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 123.7%;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 122.5%;
+}
+
+h4 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 122.5%;
+}
+
+button {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+li {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 164%;
+}
+
