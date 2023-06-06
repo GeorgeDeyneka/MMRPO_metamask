@@ -8,32 +8,37 @@ let computedAddress = computed(() => {
 
 onMounted(() => {
   isMetamaskSupported.value = (window as any).ethereum !== "undefined";
-  address.value = JSON.parse(localStorage.getItem("account")!) || [];
+  checkConnection();
 });
 
-watch(computedAddress, checkLoggedIn);
+function checkConnection() {
+  (window as any).ethereum
+    .request({ method: "eth_accounts" })
+    .then(handleAccountsChanged)
+    .catch(console.error);
+}
 
-function checkLoggedIn() {
-  isLoggedIn.value = address.value.length > 0;
-  console.log(isLoggedIn.value);
-
-  if (!isLoggedIn) {
+function handleAccountsChanged(accounts: any) {
+  if (accounts.length === 0) {
     logoutWallet();
+  } else {
+    address.value = accounts[0];
+    isLoggedIn.value = address.value.length > 0;
   }
 }
 
 function logoutWallet() {
   address.value = [];
-  localStorage.removeItem("account");
+  isLoggedIn.value = false;
 }
 
-async function connectWallet() {
-  const accounts = await (window as any).ethereum.request({
-    method: "eth_requestAccounts",
-  });
-
-  address.value = accounts[0];
-  localStorage.setItem("account", JSON.stringify(address.value));
+async function loginWallet() {
+  (window as any).ethereum
+    .request({
+      method: "eth_requestAccounts",
+    })
+    .then(handleAccountsChanged)
+    .catch(console.error);
 }
 </script>
 
@@ -49,7 +54,7 @@ async function connectWallet() {
           Here you can connect your wallet
         </h3>
         <button
-          @click="connectWallet"
+          @click="loginWallet"
           v-if="isMetamaskSupported"
           class="home__button"
         >
