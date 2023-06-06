@@ -2,6 +2,30 @@
 const isMetamaskSupported = ref(false);
 const isLoggedIn = ref(false);
 const address = ref([]);
+let computedAddress = computed(() => {
+  return address.value;
+});
+
+onMounted(() => {
+  isMetamaskSupported.value = (window as any).ethereum !== "undefined";
+  address.value = JSON.parse(localStorage.getItem("account")!) || [];
+});
+
+watch(computedAddress, checkLoggedIn);
+
+function checkLoggedIn() {
+  isLoggedIn.value = address.value.length > 0;
+  console.log(isLoggedIn.value);
+
+  if (!isLoggedIn) {
+    logoutWallet();
+  }
+}
+
+function logoutWallet() {
+  address.value = [];
+  localStorage.removeItem("account");
+}
 
 async function connectWallet() {
   const accounts = await (window as any).ethereum.request({
@@ -9,16 +33,8 @@ async function connectWallet() {
   });
 
   address.value = accounts[0];
+  localStorage.setItem("account", JSON.stringify(address.value));
 }
-
-onMounted(() => {
-  isMetamaskSupported.value = (window as any).ethereum !== "undefined";
-  isLoggedIn.value = address.value.length > 0;
-});
-
-const computedAddress = computed(() => address.value);
-
-watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
 </script>
 
 <template>
@@ -26,8 +42,12 @@ watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
     <div>
       <h1 class="home__title">Metamask Login</h1>
 
-      <div class="home__content" v-if="!isLoggedIn">
-        <h3 class="home__subtitle">Here you can connect your wallet</h3>
+      <div v-if="isLoggedIn">Wallet id: {{ computedAddress }}</div>
+
+      <div class="home__content" v-else>
+        <h3 v-if="isMetamaskSupported" class="home__subtitle">
+          Here you can connect your wallet
+        </h3>
         <button
           @click="connectWallet"
           v-if="isMetamaskSupported"
@@ -36,8 +56,6 @@ watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
           Login Metamask
         </button>
       </div>
-
-      <div v-else>Wallet id: {{ computedAddress }}</div>
     </div>
   </main>
 </template>
