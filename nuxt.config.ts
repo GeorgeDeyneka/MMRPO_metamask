@@ -11,7 +11,7 @@ export default defineNuxtConfig({
           charset: "UTF-8",
         },
       ],
-      title: "MMPRO Landing",
+      title: "MMPRO Metamask Wallet",
     },
   },
   css: ["@/assets/scss/style.scss"],

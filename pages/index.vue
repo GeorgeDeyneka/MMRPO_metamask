@@ -1,14 +1,73 @@
+<script setup lang="ts">
+const isMetamaskSupported = ref(false);
+const isLoggedIn = ref(false);
+const address = ref([]);
+
+async function connectWallet() {
+  const accounts = await (window as any).ethereum.request({
+    method: "eth_requestAccounts",
+  });
+
+  address.value = accounts[0];
+}
+
+onMounted(() => {
+  isMetamaskSupported.value = (window as any).ethereum !== "undefined";
+  isLoggedIn.value = address.value.length > 0;
+});
+
+const computedAddress = computed(() => address.value);
+
+watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
+</script>
+
 <template>
   <main class="container home">
-    <h1 class="home__title">Metamask Login</h1>
+    <div>
+      <h1 class="home__title">Metamask Login</h1>
+
+      <div class="home__content" v-if="!isLoggedIn">
+        <h3 class="home__subtitle">Here you can connect your wallet</h3>
+        <button
+          @click="connectWallet"
+          v-if="isMetamaskSupported"
+          class="home__button"
+        >
+          Login Metamask
+        </button>
+      </div>
+
+      <div v-else>Wallet id: {{ computedAddress }}</div>
+    </div>
   </main>
 </template>
-<script setup lang="ts"></script>
 
 <style lang="scss">
-// .home {
-//   &__title {
-//     color: #000;
-//   }
-// }
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home {
+  &__title {
+    padding: 20px 0;
+  }
+
+  &__subtitle {
+    padding: 10px 0;
+  }
+
+  &__button {
+    padding: 8px 30px;
+    border-radius: 5px;
+    border: none;
+    background-color: #5b3fcb;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  &__content {
+    margin: 35px 0;
+  }
+}
 </style>
