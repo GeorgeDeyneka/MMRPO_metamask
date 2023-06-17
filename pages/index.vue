@@ -2,23 +2,44 @@
 const isMetamaskSupported = ref(false);
 const isLoggedIn = ref(false);
 const address = ref([]);
-
-async function connectWallet() {
-  const accounts = await (window as any).ethereum.request({
-    method: "eth_requestAccounts",
-  });
-
-  address.value = accounts[0];
-}
+let computedAddress = computed(() => {
+  return address.value;
+});
 
 onMounted(() => {
   isMetamaskSupported.value = (window as any).ethereum !== "undefined";
-  isLoggedIn.value = address.value.length > 0;
+  checkConnection();
 });
 
-const computedAddress = computed(() => address.value);
+function checkConnection() {
+  (window as any).ethereum
+    .request({ method: "eth_accounts" })
+    .then(handleAccountsChanged)
+    .catch(console.error);
+}
 
-watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
+function handleAccountsChanged(accounts: any) {
+  if (accounts.length === 0) {
+    logoutWallet();
+  } else {
+    address.value = accounts[0];
+    isLoggedIn.value = address.value.length > 0;
+  }
+}
+
+function logoutWallet() {
+  address.value = [];
+  isLoggedIn.value = false;
+}
+
+async function loginWallet() {
+  (window as any).ethereum
+    .request({
+      method: "eth_requestAccounts",
+    })
+    .then(handleAccountsChanged)
+    .catch(console.error);
+}
 </script>
 
 <template>
@@ -26,18 +47,20 @@ watch(computedAddress, () => (isLoggedIn.value = address.value.length > 0));
     <div>
       <h1 class="home__title">Metamask Login</h1>
 
-      <div class="home__content" v-if="!isLoggedIn">
-        <h3 class="home__subtitle">Here you can connect your wallet</h3>
+      <div v-if="isLoggedIn">Wallet id: {{ computedAddress }}</div>
+
+      <div class="home__content" v-else>
+        <h3 v-if="isMetamaskSupported" class="home__subtitle">
+          Here you can connect your wallet
+        </h3>
         <button
-          @click="connectWallet"
+          @click="loginWallet"
           v-if="isMetamaskSupported"
           class="home__button"
         >
           Login Metamask
         </button>
       </div>
-
-      <div v-else>Wallet id: {{ computedAddress }}</div>
     </div>
   </main>
 </template>
